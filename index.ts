@@ -18,6 +18,16 @@ class Module {
   }
 }
 
-range(10)
-  .map(n => new Module(`test${n}`))
-  .forEach(module => fs.writeFileSync(`build/${module.name}.ts`, module.emit()));
+const modules = range(5).map(n => new Module(`test${n}`));
+modules.forEach(module => fs.writeFileSync(`build/${module.name}.ts`, module.emit()));
+
+const indexModule = `
+${modules.map(module => `import * as ${module.name} from './${module.name}'`).join("\n")}
+
+export function writeAll() {
+  ${modules.map(module => `  ${module.name}.sampleFunction()`).join("\n")}  
+}
+
+`
+
+fs.writeFileSync(`build/index.ts`, indexModule);
